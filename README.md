@@ -60,6 +60,9 @@ funcionalidades.
 - npm (versão >= 7.0)
 - PHP (versão >= 8.1 )
 
+### Dependências do Projeto:
+- Breeze (versão >= 1.29)
+
 ### Funcionalidades Implementadas
 - [ ] Autenticação de usuários com Laravel Breeze
 - [ ] Níveis de acesso (Admin e Usuário comum)
