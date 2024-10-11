@@ -61,7 +61,10 @@ funcionalidades.
 - PHP (versão >= 8.1 )
 
 ### Dependências do Projeto:
-- Breeze (versão >= 1.29)
+- [Breeze (versão >= 1.29)](https://laravel.com/docs/10.x/starter-kits)
+- [lucascudo/laravel-pt-BR-localization (versão >= 2.2.4)](https://github.com/lucascudo/laravel-pt-BR-localization)
+
+
 
 ### Funcionalidades Implementadas
 - [ ] Autenticação de usuários com Laravel Breeze

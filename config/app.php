@@ -82,7 +82,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'pt_BR', //tradução -> dependência lucascudo/laravel-pt-BR-localization
 
     /*
     |--------------------------------------------------------------------------
