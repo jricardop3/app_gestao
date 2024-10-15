@@ -2,7 +2,8 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -23,6 +24,14 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+                // Exemplo de uma Gate simples para verificar se o usuário é admin
+            Gate::define('admin-access', function (User $user) {
+                return $user->role === 'admin'; // Verifica se o usuário tem a role 'admin'
+            });
+    
+            // Gate para verificar se o usuário tem a role de 'user'
+            Gate::define('user-access', function (User $user) {
+                return $user->role === 'user';
+            });
     }
 }
