@@ -67,8 +67,8 @@ funcionalidades.
 
 
 ### Funcionalidades Implementadas
-- [ ] Autenticação de usuários com Laravel Breeze
-- [ ] Níveis de acesso (Admin e Usuário comum)
-- [ ] CRUD de contas a pagar e receber
+- [X] Autenticação de usuários com Laravel Breeze
+- [X] Níveis de acesso (Admin e Usuário comum)
+- [X] CRUD de contas a pagar e receber
 - [ ] Proteções de segurança (SQL Injection e XSS)
 - [ ] Testes unitários e de integração com PHPUnit

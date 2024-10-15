@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,4 +24,10 @@ class Account extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getDueDateAttribute($value)
+    {
+        return Carbon::parse($value);
+    }
+    
 }
