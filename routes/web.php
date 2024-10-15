@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     // Rotas para o administrador
     Route::prefix('admin/accounts')->name('admin.accounts.')->group(function () {
         Route::get('/', [AdminAccountController::class, 'index'])->name('index');
+        Route::get('/create', [AdminAccountController::class, 'create'])->name('create');
         Route::get('/{account}/edit', [AdminAccountController::class, 'edit'])->name('edit');
         Route::put('/{account}', [AdminAccountController::class, 'update'])->name('update');
         Route::delete('/{account}', [AdminAccountController::class, 'destroy'])->name('destroy');

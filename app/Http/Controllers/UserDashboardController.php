@@ -17,11 +17,13 @@ class UserDashboardController extends Controller
         $this->authorize('user-access');
         $user = auth()->user();
     
-        // Usar consultas diretas na tabela 'accounts'
-        $totalToPay = Account::where('user_id', $user->id)->where('status', 'pending')->sum('amount'); // ajuste 'pendente' para 'pending'
-        $totalToReceive = Account::where('user_id', $user->id)->where('status', 'paid')->sum('amount'); // ajuste 'receber' para 'paid'
-        $pendingCount = Account::where('user_id', $user->id)->where('status', 'pending')->count(); // ajuste 'pendente' para 'pending'
-        $accounts = Account::where('user_id', $user->id)->get();
+        // Resumo das contas do usuário
+        $totalToPay = Account::where('user_id', $user->id)->where('status', 'pending')->sum('amount'); // Total a pagar
+        $totalToReceive = Account::where('user_id', $user->id)->where('status', 'paid')->sum('amount'); // Total a receber
+        $pendingCount = Account::where('user_id', $user->id)->where('status', 'pending')->count(); // Contas pendentes
+
+        // Paginação das contas do usuário
+        $accounts = Account::where('user_id', $user->id)->paginate(10); // Paginar 10 contas por página
     
         return view('user-dashboard', compact('totalToPay', 'totalToReceive', 'pendingCount', 'accounts'));
     }

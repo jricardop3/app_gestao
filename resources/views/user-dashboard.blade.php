@@ -1,9 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('User Dashboard') }}
-        </h2>
-    </x-slot>
+
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -75,6 +71,30 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <!-- Paginação -->
+                    <div class="mt-6 flex justify-center">
+                        <nav role="navigation" aria-label="Pagination Navigation" class="flex items-center space-x-2">
+                            @if ($accounts->onFirstPage())
+                                <span class="px-3 py-1 bg-gray-200 text-gray-500 cursor-not-allowed rounded-md">Anterior</span>
+                            @else
+                                <a href="{{ $accounts->previousPageUrl() }}" class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-md">Anterior</a>
+                            @endif
+                    
+                            @foreach ($accounts->links()->elements[0] as $page => $url)
+                                @if ($page == $accounts->currentPage())
+                                    <span class="px-3 py-1 bg-gray-500 text-white font-semibold rounded-md">{{ $page }}</span> <!-- Cor verde -->
+                                @else
+                                    <a href="{{ $url }}" class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-md">{{ $page }}</a>
+                                @endif
+                            @endforeach
+                    
+                            @if ($accounts->hasMorePages())
+                                <a href="{{ $accounts->nextPageUrl() }}" class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-md">Próxima</a>
+                            @else
+                                <span class="px-3 py-1 bg-gray-200 text-gray-500 cursor-not-allowed rounded-md">Próxima</span>
+                            @endif
+                        </nav>
+                    </div>
                 </div>
 
                 <!-- Botão para Adicionar Nova Conta -->
