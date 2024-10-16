@@ -7,16 +7,6 @@ use Illuminate\Http\Request;
 
 class UserAccountController extends Controller
 {
-    public function index()
-    {
-
-        $accounts = Account::where('user_id', auth()->id())->get();
-        return view('user.accounts.index', compact('accounts'));
-    }
-    
-    
-    
-
     public function create()
     {
         return view('user.accounts.create');
@@ -24,63 +14,57 @@ class UserAccountController extends Controller
 
     public function store(Request $request)
     {
-        // Validação
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'amount' => 'required|numeric',
-            'due_date' => 'required|date',
-            'status' => 'required|in:paid,pending', // Exemplo de status
-        ]);
-    
-        try {
-            // Criar nova conta e associar ao usuário autenticado
-            $account = new Account($validatedData); // Usa os dados validados
-            $account->user_id = auth()->id(); // Associar a conta ao usuário autenticado
-            $account->save(); // Salvar a conta no banco de dados
-    
-            // Redirecionar de volta à lista de contas com uma mensagem de sucesso
-            return redirect()->route('user.dashboard')->with('success', 'Conta criada com sucesso.');
-        } catch (\Exception $e) {
-            // Se houver uma exceção, redirecionar de volta para a rota de criação com uma mensagem de erro
-            return redirect()->route('user.accounts.create')->withErrors(['error' => 'Erro ao criar conta: ' . $e->getMessage()])->withInput();
-        }
-    }
-    
-    
-
-    public function edit(Account $account)
-    {
-        // Verificar se o usuário pode editar essa conta
-        $this->authorize('update', $account);
-        
-        // Retornar a view de edição com a conta
-        return view('user.accounts.edit', compact('account'));
-    }
-
-    public function update(Request $request, Account $account)
-    {
-        // Validação
-        $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|in:pagar,receber',
             'description' => 'nullable|string',
             'amount' => 'required|numeric',
             'due_date' => 'required|date',
             'status' => 'required|in:paid,pending',
         ]);
 
-        // Atualizar a conta
-        $account->update($request->all());
+        try {
+            $account = new Account($validatedData);
+            $account->user_id = auth()->id();
+            $account->save();
 
-        return redirect()->route('user.dashboard')->with('success', 'Conta atualizada com sucesso.');
+            return redirect('/dashboard')->with('success', 'Conta criada com sucesso.');
+        } catch (\Exception $e) {
+            return redirect()->route('user.accounts.create')->withErrors(['error' => 'Erro ao criar conta: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function edit(Account $account)
+    {
+        // Verifica se o usuário tem permissão para editar a conta
+        $this->authorize('update', $account);
+
+        return view('user.accounts.edit', compact('account'));
+    }
+
+    public function update(Request $request, Account $account)
+    {
+        // Validação dos dados
+        $validatedData = $request->validate([
+            'title' => 'required|in:pagar,receber',
+            'description' => 'nullable|string',
+            'amount' => 'required|numeric',
+            'due_date' => 'required|date',
+            'status' => 'required|in:paid,pending',
+        ]);
+
+        // Atualiza a conta
+        $this->authorize('update', $account); // Verifica a autorização antes de atualizar
+        $account->update($validatedData);
+
+        return redirect('/dashboard')->with('success', 'Conta atualizada com sucesso.');
     }
 
     public function destroy(Account $account)
     {
-        // Verificar se o usuário pode excluir essa conta
+        // Verifica se o usuário tem permissão para deletar a conta
         $this->authorize('delete', $account);
         $account->delete();
 
-        return redirect()->route('user.dashboard')->with('success', 'Conta excluída com sucesso.');
+        return redirect('/dashboard')->with('success', 'Conta excluída com sucesso.');
     }
 }

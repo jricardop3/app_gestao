@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
+use App\Models\Account; // Importa o modelo Account
+use App\Policies\AccountPolicy; // Importa a política AccountPolicy
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -14,7 +16,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        Account::class => AccountPolicy::class, // Registra a política para o modelo Account
     ];
 
     /**
@@ -24,14 +26,14 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-                // Exemplo de uma Gate simples para verificar se o usuário é admin
-            Gate::define('admin-access', function (User $user) {
-                return $user->role === 'admin'; // Verifica se o usuário tem a role 'admin'
-            });
+        // Exemplo de uma Gate simples para verificar se o usuário é admin
+        Gate::define('admin-access', function (User $user) {
+            return $user->role === 'admin'; // Verifica se o usuário tem a role 'admin'
+        });
     
-            // Gate para verificar se o usuário tem a role de 'user'
-            Gate::define('user-access', function (User $user) {
-                return $user->role === 'user';
-            });
+        // Gate para verificar se o usuário tem a role de 'user'
+        Gate::define('user-access', function (User $user) {
+            return $user->role === 'user';
+        });
     }
 }

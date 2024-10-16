@@ -3,24 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminAccountController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('admin-access');
         $user = auth()->user();
+    
+        // Obtém todos os usuários
+        $users = User::all();
     
         // Resumo das contas de todos os usuários
         $totalToPay = Account::where('status', 'pending')->sum('amount'); // Total a pagar
         $totalToReceive = Account::where('status', 'paid')->sum('amount'); // Total a receber
         $pendingCount = Account::where('status', 'pending')->count(); // Contas pendentes
         
-        // Paginação das contas de todos os usuários (10 por página)
-        $allAccounts = Account::with('user')->paginate(10); // Defina o número desejado de registros por página
+        // Filtra as contas com base no usuário selecionado
+        $selectedUserId = $request->input('user_id');
+        $allAccounts = Account::with('user')
+            ->when($selectedUserId, function ($query, $selectedUserId) {
+                return $query->where('user_id', $selectedUserId);
+            })
+            ->paginate(10); // Paginação das contas de todos os usuários (10 por página)
     
-        return view('admin.accounts.index', compact('totalToPay', 'totalToReceive', 'pendingCount', 'allAccounts'));
+        return view('admin.accounts.index', compact('totalToPay', 'totalToReceive', 'pendingCount', 'allAccounts', 'users', 'selectedUserId'));
     }
     
 
@@ -33,13 +42,13 @@ class AdminAccountController extends Controller
     public function update(Request $request, Account $account)
     {
         $this->authorize('admin-access'); // Verifica se o usuário é admin
-        
+    
         // Ajusta o valor de amount para o formato numérico
         $request['amount'] = str_replace(',', '.', $request['amount']);
     
         // Validação
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|in:pagar,receber',
             'description' => 'nullable|string',
             'amount' => 'required|numeric',
             'due_date' => 'required|date',
@@ -56,6 +65,7 @@ class AdminAccountController extends Controller
             return redirect()->route('admin.accounts.index')->with('error', 'Ocorreu um erro ao atualizar a conta.');
         }
     }
+    
     
     
     

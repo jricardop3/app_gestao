@@ -6,6 +6,7 @@ use App\Http\Controllers\MailController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserAccountController;
 use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\UserReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -61,6 +62,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/{account}', [AdminAccountController::class, 'update'])->name('update');
         Route::delete('/{account}', [AdminAccountController::class, 'destroy'])->name('destroy');
     });
+
+    // Rotas para o relatório do usuario
+    Route::post('/admin/reports/user', [UserReportController::class, 'show'])->name('admin.reports.user');
 });
 
 

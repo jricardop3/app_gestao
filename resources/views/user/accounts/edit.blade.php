@@ -22,7 +22,11 @@
                 
                 <div class="mb-4">
                     <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
-                    <input type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500" name="title" value="{{ old('title', $account->title) }}" required>
+                    <select id="title" name="title" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="pagar" {{ old('title', $account->title) === 'pagar' ? 'selected' : '' }}>Pagar</option>
+                        <option value="receber" {{ old('title', $account->title) === 'receber' ? 'selected' : '' }}>Receber</option>
+                    </select>
                     @error('title')
                         <div class="text-red-500 text-sm">{{ $message }}</div>
                     @enderror

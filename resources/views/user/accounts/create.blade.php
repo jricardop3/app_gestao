@@ -18,7 +18,11 @@
                 @csrf
                 <div class="mb-4">
                     <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
-                    <input type="text" id="title" name="title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('title') }}" required>
+                    <select id="title" name="title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="pagar" {{ old('title') === 'pagar' ? 'selected' : '' }}>Pagar</option>
+                        <option value="receber" {{ old('title') === 'receber' ? 'selected' : '' }}>Receber</option>
+                    </select>
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-700">Descrição</label>

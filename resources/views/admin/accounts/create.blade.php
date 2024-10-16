@@ -38,10 +38,17 @@
                     <input type="date" id="due_date" name="due_date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('due_date') }}" required>
                 </div>
                 <div class="mb-4">
+                    <label for="type" class="block text-sm font-medium text-gray-700">Tipo de Conta</label>
+                    <select id="type" name="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="pay" {{ old('type') === 'pay' ? 'selected' : '' }}>Pagar</option>
+                        <option value="receive" {{ old('type') === 'receive' ? 'selected' : '' }}>Receber</option>
+                    </select>
+                </div>
+                <div class="mb-4">
                     <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                     <select id="status" name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
-                        <option value="pending" {{ old('status') === 'pendente' ? 'selected' : '' }}>Pendente</option>
-                        <option value="paid" {{ old('status') === 'pago' ? 'selected' : '' }}>Pago</option>
+                        <option value="pending" {{ old('status') === 'pending' ? 'selected' : '' }}>Pendente</option>
+                        <option value="paid" {{ old('status') === 'paid' ? 'selected' : '' }}>Pago</option>
                     </select>
                 </div>
                 <x-primary-button class="mt-4">{{ __('Salvar') }}</x-primary-button>

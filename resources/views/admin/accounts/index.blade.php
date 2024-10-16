@@ -3,15 +3,38 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <div class="p-6 text-gray-900 bg-gray-100 rounded-md shadow">
-                        <h3 class="font-semibold text-lg">Resumo das Contas</h3>
-                        <ul class="list-disc pl-5">
-                            <li>Total a Pagar: <strong>R$ {{ number_format($totalToPay, 2, ',', '.') }}</strong></li>
-                            <li>Total a Receber: <strong>R$ {{ number_format($totalToReceive, 2, ',', '.') }}</strong></li>
-                            <li>Contas Pendentes: <strong>{{ $pendingCount }}</strong></li>
-                        </ul>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Resumo das Contas -->
+                        <div class="p-6 text-gray-900 bg-gray-100 rounded-md shadow mb-4">
+                            <h3 class="font-semibold text-lg">Resumo das Contas</h3>
+                            <ul class="list-disc pl-5">
+                                <li>Total a Pagar: <strong>R$ {{ number_format($totalToPay, 2, ',', '.') }}</strong></li>
+                                <li>Total a Receber: <strong>R$ {{ number_format($totalToReceive, 2, ',', '.') }}</strong></li>
+                                <li>Contas Pendentes: <strong>{{ $pendingCount }}</strong></li>
+                            </ul>
+                        </div>
+                
+                        <!-- Formulário de Relatório -->
+                        <div class="p-6 text-gray-900 bg-gray-100 rounded-md shadow mb-4">
+                            <form action="{{ route('admin.reports.user') }}" method="POST" class="flex items-center">
+                                @csrf
+                                <label for="user_id" class="mr-2">Usuários:</label>
+                                <select name="user_id" id="user_id" class="border border-gray-300 rounded-md p-2">
+                                    <option value="">Selecione um usuário</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="ml-2">
+                                    <x-primary-button>
+                                        Relatório
+                                    </x-primary-button>
+                                </button>
+                            </form>
+                            
+                        </div>
                     </div>
-
+                
                     <!-- Notificações -->
                     <div class="p-6 text-gray-900">
                         @if (session('success'))
@@ -26,6 +49,9 @@
                         @endif
                     </div>
                 </div>
+                
+                
+                
 
                 <!-- Resumo das Contas -->
 
@@ -94,16 +120,6 @@
                             @endif
                         </nav>
                     </div>
-                    
-
-                <!-- Botão para Adicionar Nova Conta -->
-                <div class="p-6 text-gray-900">
-                    <a href="{{ route('admin.accounts.create') }}">
-                        <x-primary-button>
-                            Adicionar Nova Conta
-                        </x-primary-button>
-                    </a>
-                </div>
             </div>
         </div>
     </div>

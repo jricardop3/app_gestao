@@ -2,98 +2,131 @@
 
 namespace Tests\Feature;
 
-use App\Models\User; // Importa o modelo User
-use App\Models\Account; // Importa o modelo Account
-use Illuminate\Foundation\Testing\RefreshDatabase; // Importa o trait para reiniciar o banco de dados a cada teste
-use Tests\TestCase; // Importa a classe base para testes
+use App\Models\User;
+use App\Models\Account;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class UserAccountTest extends TestCase
 {
-    use RefreshDatabase; // Aplica o trait para garantir que o banco de dados seja limpo antes de cada teste
+    use RefreshDatabase; // Descomente esta linha para usar o RefreshDatabase
 
-    protected User $user; // Declaração da propriedade $user para armazenar o usuário autenticado
+    protected User $user;
 
-    // Método que é executado antes de cada teste
     protected function setUp(): void
     {
-        parent::setUp(); // Chama o método de configuração da classe pai
-        $this->user = User::factory()->create(); // Cria um novo usuário usando uma fábrica
-        $this->actingAs($this->user); // Autentica o usuário para que ele possa interagir com as rotas protegidas
+        parent::setUp();
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
     }
 
     /** @test */
     public function it_can_create_an_account()
     {
-        // Envia uma solicitação POST para a rota que armazena uma nova conta
         $response = $this->post(route('user.accounts.store'), [
-            'title' => 'Conta Teste', // Título da conta
-            'description' => 'Descrição da conta teste', // Descrição da conta
-            'amount' => 100.00, // Montante da conta
-            'due_date' => '2024-12-31', // Data de vencimento
-            'status' => 'pending', // Status da conta
+            'title' => 'pagar',
+            'amount' => 100.00,
+            'due_date' => '2024-12-31',
+            'status' => 'pending',
         ]);
 
-        // Verifica se a resposta redireciona para o dashboard do usuário
-        $response->assertRedirect(route('user.dashboard'));
-        // Verifica se a conta foi criada no banco de dados
+        $response->assertRedirect('/dashboard');
         $this->assertDatabaseHas('accounts', [
-            'title' => 'Conta Teste', // Verifica se o título está correto
-            'user_id' => $this->user->id, // Verifica se a conta pertence ao usuário autenticado
+            'title' => 'pagar',
+            'user_id' => $this->user->id,
         ]);
     }
 
     /** @test */
     public function it_can_edit_an_account()
     {
-        // Cria uma conta para ser editada
-        $account = Account::create([
-            'title' => 'Conta Teste', // Título inicial da conta
-            'description' => 'Descrição da conta teste', // Descrição inicial da conta
-            'amount' => 100.00, // Montante inicial da conta
-            'due_date' => '2024-12-31', // Data de vencimento inicial
-            'status' => 'paid', // Status inicial da conta
-            'user_id' => $this->user->id, // Define o usuário proprietário da conta
-        ]);
+        // Cria uma conta associada ao usuário autenticado
+        $account = Account::factory()->create(['user_id' => $this->user->id]);
 
-        // Envia uma solicitação PUT para atualizar a conta existente
-        $response = $this->put(route('user.accounts.update', $account), [
-            'title' => 'Conta Editada', // Novo título da conta
-            'description' => 'Descrição da conta editada', // Nova descrição da conta
-            'amount' => 200.00, // Novo montante da conta
-            'due_date' => '2025-01-31', // Nova data de vencimento
-            'status' => 'paid', // Novo status da conta
-        ]);
+        // Define os dados a serem enviados na requisição de edição
+        $data = [
+            'title' => 'receber',
+            'description' => 'Teste de edição',
+            'amount' => 100,
+            'due_date' => now()->addDays(30)->toDateString(),
+            'status' => 'pending',
+        ];
 
-        // Verifica se a resposta redireciona para o dashboard do usuário
-        $response->assertRedirect(route('user.dashboard'));
-        // Verifica se a conta foi atualizada no banco de dados
+        // Envia uma requisição PUT para atualizar a conta
+        $response = $this->put(route('user.accounts.update', $account->id), $data);
+
+        // Verifica se o redirecionamento foi para o dashboard e se a mensagem de sucesso está presente
+        $response->assertRedirect('/dashboard');
+        $response->assertSessionHas('success', 'Conta atualizada com sucesso.');
+
+        // Verifica se os dados da conta foram atualizados no banco de dados
         $this->assertDatabaseHas('accounts', [
-            'title' => 'Conta Editada', // Verifica se o novo título está correto
-            'user_id' => $this->user->id, // Verifica se a conta pertence ao usuário autenticado
+            'id' => $account->id,
+            'title' => 'receber',
+            'description' => 'Teste de edição',
+            'amount' => 100,
+            'due_date' => now()->addDays(30)->toDateString(),
+            'status' => 'pending',
         ]);
+    }
+
+    /** @test */
+    public function it_cannot_edit_another_users_account()
+    {
+        // Cria um usuário e uma conta associada a ele
+        $owner = User::factory()->create();
+        $account = Account::factory()->create(['user_id' => $owner->id]);
+
+        // Faz login como um usuário diferente
+        $this->actingAs($this->user);
+
+        // Tenta editar a conta que pertence ao outro usuário
+        $data = [
+            'title' => 'receber',
+            'amount' => 100,
+            'due_date' => now()->addDays(30)->toDateString(),
+            'status' => 'pending',
+        ];
+
+        $response = $this->put(route('user.accounts.update', $account->id), $data);
+
+        // Verifica se o acesso foi negado (uma exceção deve ser lançada)
+        $response->assertStatus(403);
     }
 
     /** @test */
     public function it_can_delete_an_account()
     {
-        // Cria uma conta para ser excluída
         $account = Account::create([
-            'title' => 'Conta Teste', // Título da conta
-            'description' => 'Descrição da conta teste', // Descrição da conta
-            'amount' => 100.00, // Montante da conta
-            'due_date' => '2024-12-31', // Data de vencimento
-            'status' => 'paid', // Status da conta
-            'user_id' => $this->user->id, // Define o usuário proprietário da conta
+            'title' => 'Conta Teste',
+            'amount' => 100.00,
+            'due_date' => '2024-12-31',
+            'status' => 'paid',
+            'user_id' => $this->user->id,
         ]);
 
-        // Envia uma solicitação DELETE para remover a conta
         $response = $this->delete(route('user.accounts.destroy', $account));
 
-        // Verifica se a resposta redireciona para o dashboard do usuário
-        $response->assertRedirect(route('user.dashboard'));
-        // Verifica se a conta foi removida do banco de dados
+        $response->assertRedirect('/dashboard');
         $this->assertDatabaseMissing('accounts', [
-            'id' => $account->id, // Verifica se a conta com o ID específico não está mais no banco de dados
+            'id' => $account->id,
         ]);
+    }
+
+    /** @test */
+    public function it_cannot_delete_another_users_account()
+    {
+        // Cria um usuário e uma conta associada a ele
+        $owner = User::factory()->create();
+        $account = Account::factory()->create(['user_id' => $owner->id]);
+
+        // Faz login como um usuário diferente
+        $this->actingAs($this->user);
+
+        // Tenta deletar a conta que pertence ao outro usuário
+        $response = $this->delete(route('user.accounts.destroy', $account));
+
+        // Verifica se o acesso foi negado (uma exceção deve ser lançada)
+        $response->assertStatus(403);
     }
 }

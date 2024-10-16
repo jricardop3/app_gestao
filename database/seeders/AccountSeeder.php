@@ -15,6 +15,6 @@ class AccountSeeder extends Seeder
     public function run()
     {
         // Criar 50 contas fictícias
-        Account::factory()->count(50)->create();
+        Account::factory()->count(500)->create();
     }
 }
